@@ -19,7 +19,7 @@ A RESTful API for managing customer orders, built as part of CSC 820: Large-Scal
    ```
 3. Start the server:
    ```bash
-   node app.js
+   node server.js
    ```
 
 The API will be available at `http://localhost:3000`.
@@ -175,3 +175,23 @@ All endpoints include input validation and return appropriate HTTP status codes:
 ## Async Behavior
 
 The `POST /orders` endpoint simulates a payment processing step by awaiting a 2-second Promise-based delay before confirming the order. This demonstrates non-blocking asynchronous operations using `async/await` syntax. The operation is wrapped in a `try/catch` block to gracefully handle any errors during processing.
+
+## Testing
+
+### Unit Tests (Jest)
+
+Automated unit tests are written with Jest and Supertest. Tests cover all five endpoints, including both successful operations and error handling.
+
+To run the tests:
+
+```bash
+npm test
+```
+
+Test cases:
+
+- `POST /orders` — Creates a new order and expects `201 Created`
+- `GET /orders` — Retrieves all orders and expects `200 OK`
+- `GET /orders/:id` — Requests a non-existent order and expects `404 Not Found`
+- `PATCH /orders/:id` — Updates an order status and expects `200 OK`
+- `DELETE /orders/:id` — Removes an order and expects `200 OK`

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: order-management
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: order-management
@@ -17,4 +17,3 @@ spec:
         image: jmy5323/module10:latest
         ports:
         - containerPort: 3000
-        imagePullPolicy: Always

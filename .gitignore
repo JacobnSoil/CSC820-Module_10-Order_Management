@@ -1,3 +1,4 @@
 node_modules/
 database/orders.db
 .dockerignore
+coverage/

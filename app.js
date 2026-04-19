@@ -1,7 +1,8 @@
-const express = require('express')
-const sqlite = require('better-sqlite3')
-const db = new sqlite('./database/orders.db')
-const app = express()
+const express = require('express');
+const Database = require('better-sqlite3');
+const dbPath = process.env.DB_PATH || './database/orders.db';
+const db = new Database(dbPath);
+const app = express();
 
 app.use(express.json())
 
@@ -107,3 +108,4 @@ app.delete('/orders/:id', (req, res) => {
 });
 
 module.exports = app
+module.exports.db = db;

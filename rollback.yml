@@ -1,0 +1,34 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Stop the Node.js app
+      command: pm2 stop my-node-app
+      ignore_errors: yes
+
+    - name: Delete PM2 process
+      command: pm2 delete my-node-app
+      ignore_errors: yes
+
+    - name: Remove the application directory
+      file:
+        path: /home/ubuntu/my-node-app
+        state: absent
+
+    - name: Stop PostgreSQL service
+      service:
+        name: postgresql
+        state: stopped
+        enabled: no
+
+    - name: Uninstall PostgreSQL
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+        state: absent
+        purge: yes
+
+    - name: Remove unused dependencies
+      apt:
+        autoremove: yes

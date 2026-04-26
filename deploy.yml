@@ -1,0 +1,91 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Add NodeSource apt key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+        state: present
+
+    - name: Add NodeSource apt repository for Node.js 20
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_20.x nodistro main"
+        state: present
+        update_cache: yes
+
+    - name: Install Node.js 20
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Install build tools for native npm modules
+      apt:
+        name:
+          - build-essential
+          - python3
+        state: present
+
+    - name: Install PostgreSQL and Python dependencies
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - python3-psycopg2
+          - acl
+        state: present
+
+    - name: Ensure PostgreSQL service is running
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Create database
+      postgresql_db:
+        name: my_database
+        state: present
+      become_user: postgres
+
+    - name: Create database user
+      postgresql_user:
+        db: my_database
+        name: app_user
+        password: securepassword123
+        priv: ALL
+        state: present
+      become_user: postgres
+
+    - name: Copy application files
+      ansible.posix.synchronize:
+        src: /home/JackHost/Documents/repo/CSC820-Module_13-Order_Management/
+        dest: /home/ubuntu/my-node-app/
+        rsync_opts:
+          - "--exclude=node_modules"
+          - "--exclude=.git"
+          - "--exclude=postman_screenshots"
+          - "--exclude=test"
+
+    - name: Remove stale node_modules to force fresh install
+      file:
+        path: /home/ubuntu/my-node-app/node_modules
+        state: absent
+
+    - name: Install app dependencies
+      npm:
+        path: /home/ubuntu/my-node-app
+        state: present
+
+    - name: Install PM2 globally
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Start the Node.js app with PM2
+      command: pm2 start server.js --name "my-node-app"
+      args:
+        chdir: /home/ubuntu/my-node-app
